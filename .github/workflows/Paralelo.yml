@@ -1,0 +1,33 @@
+name: Paralelo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  API:
+    runs-on: ubuntu-24.04
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar teste de API
+        run: npx cypress run --spec "cypress/e2e/2-Teste_API/Tarefa_1_e_2.cy.js"
+
+  E2E:
+    runs-on: ubuntu-24.04
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar teste E2E
+        run: npx cypress run --spec "cypress/e2e/3-End_to_End/Tarefa_1_e_2.cy.js"

@@ -1,0 +1,20 @@
+name: Sequencial
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Sequencial:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar todos os testes
+        run: npx cypress run
