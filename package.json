@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "cypress": "cypress open",
-    "cypressReport": "rm -rf cypress/reports && npx cypress run && npx mochawesome-merge cypress/reports/*.json -o cypress/reports/merged-report.json && npx marge cypress/reports/merged-report.json --reportDir cypress/reports/html --reportFilename index.html"
+    "cypressReport": "rm -rf cypress/reports && npx cypress run && npx mochawesome-merge cypress/reports/*.json -o cypress/reports/merged-report.json && npx marge cypress/reports/merged-report.json --reportDir cypress/reports/html --reportFilename index.html",
+    "windowsReport": "rmdir /s /q cypress\\reports && npx cypress run && npx mochawesome-merge cypress/reports/*.json -o cypress/reports/merged-report.json && npx marge cypress/reports/merged-report.json --reportDir cypress/reports/html --reportFilename index.html"
   },
   "keywords": [],
   "author": "",
