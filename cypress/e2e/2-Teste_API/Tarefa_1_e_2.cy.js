@@ -1,31 +1,20 @@
 /// <reference types="cypress" />
 
+import { CADASTRO } from '../../support/api/endpoints';
+import { gerarCadastro } from '../../support/api/payloads';
 
-import { faker } from '@faker-js/faker';
 
-
-describe('Testes da API', () => {
-    const baseUrl = 'https://688b7a952a52cabb9f51e423.mockapi.io/api/v1/cadastro';
-
-    const name = faker.person.fullName();
-    const email = faker.internet.email();
-    const nameAtualizado = faker.person.fullName();
-    const emailAtualizado = faker.internet.email();
-
+describe('Testes da API - Cadastro', () => {
     let Id = null;
+    const cadastro = gerarCadastro();
+    const cadastroAtualizado = gerarCadastro();
 
 
     it('GET - Validar se a API está retornando status 200', () => {
-
-        const requestPayload = {
+        cy.api({
             method: 'GET',
-            url: baseUrl,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        cy.api(requestPayload)
+            url: CADASTRO
+        })
             .then((response) => {
                 expect(response.headers).to.have.property('content-type').and.include('application/json');
 
@@ -38,18 +27,11 @@ describe('Testes da API', () => {
 
 
     it('GET - Validar URL incorreta, deve retornar status 404', () => {
-
-        const requestPayload = {
+        cy.api({
             method: 'GET',
-            url: 'https://688b7a952a52cabb9f51e423.mockapi.io/api/v1/cadastros',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-
+            url: `${CADASTRO}s`,
             failOnStatusCode: false
-        };
-
-        cy.api(requestPayload)
+        })
             .then((response) => {
                 expect(response.status).to.eq(404);
                 expect(response.body).to.contain("Not found");
@@ -58,24 +40,13 @@ describe('Testes da API', () => {
     });
 
 
-    it('POST - Enviar Requisição para ULR incorreta deve retornar 400', () => {
-
-        const requestPayload = {
+    it('POST - Enviar requisição para URL incorreta deve retornar 400', () => {
+        cy.api({
             method: 'POST',
-            url: 'https://688b7a952a52cabb9f51e423.mockapi.io/api/v1/cadastros',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-
-            body: {
-                name: name,
-                email: email,
-            },
-
+            url: `${CADASTRO}s`,
+            body: cadastro,
             failOnStatusCode: false
-        };
-
-        cy.api(requestPayload)
+        })
             .then((response) => {
                 expect(response.status).to.eq(400);
 
@@ -86,31 +57,21 @@ describe('Testes da API', () => {
 
 
     it('POST - Criar novo cadastro', () => {
-
-        const requestPayload = {
+        cy.api({
             method: 'POST',
-            url: baseUrl,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-
-            body: {
-                name: name,
-                email: email,
-            }
-        };
-
-        cy.api(requestPayload)
+            url: CADASTRO,
+            body: cadastro
+        })
             .then((response) => {
                 expect(response.headers).to.have.property('content-type').and.include('application/json');
 
                 expect(response.status).to.eq(201);
 
                 expect(response.body).to.have.property('createdAt');
-                expect(response.body).to.have.property('name', name);
+                expect(response.body).to.have.property('name', cadastro.name);
                 expect(response.body).to.have.property('avatar');
                 expect(response.body).to.have.property('id');
-                expect(response.body).to.have.property('email', email);
+                expect(response.body).to.have.property('email', cadastro.email);
 
                 Id = response.body.id;
             });
@@ -119,43 +80,29 @@ describe('Testes da API', () => {
 
 
     it('GET - Buscar cadastro efetuado anteriormente', () => {
-
-        const requestPayload = {
+        cy.api({
             method: 'GET',
-            url: `${baseUrl}/${Id}`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        cy.api(requestPayload)
+            url: `${CADASTRO}/${Id}`
+        })
             .then((response) => {
                 expect(response.headers).to.have.property('content-type').and.include('application/json');
 
                 expect(response.status).to.eq(200);
 
                 expect(response.body).to.have.property('id', Id);
-                expect(response.body).to.have.property('name', name);
-                expect(response.body).to.have.property('email', email);
-
+                expect(response.body).to.have.property('name', cadastro.name);
+                expect(response.body).to.have.property('email', cadastro.email);
             });
 
     });
 
 
-    it('GET - Buscar Registro Inexistente, deve retornar status 404', () => {
-
-        const requestPayload = {
+    it('GET - Buscar registro inexistente, deve retornar status 404', () => {
+        cy.api({
             method: 'GET',
-            url: `${baseUrl}/99999a`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-
+            url: `${CADASTRO}/99999a`,
             failOnStatusCode: false
-        };
-
-        cy.api(requestPayload)
+        })
             .then((response) => {
                 expect(response.status).to.eq(404);
 
@@ -165,47 +112,32 @@ describe('Testes da API', () => {
     });
 
 
-    it('PUT - Atualizar os dados do cadastro', () => {
-
-        const requestPayload = {
+    it('PUT - Atualizar dados do cadastro', () => {
+        cy.api({
             method: 'PUT',
-            url: `${baseUrl}/${Id}`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-
-            body: {
-                name: nameAtualizado,
-                email: emailAtualizado,
-            }
-        };
-
-        cy.api(requestPayload)
+            url: `${CADASTRO}/${Id}`,
+            body: cadastroAtualizado
+        })
             .then((response) => {
                 expect(response.headers).to.have.property('content-type').and.include('application/json');
 
                 expect(response.status).to.eq(200);
 
                 expect(response.body).to.have.property('createdAt');
-                expect(response.body).to.have.property('name', nameAtualizado);
+                expect(response.body).to.have.property('name', cadastroAtualizado.name);
                 expect(response.body).to.have.property('avatar');
-                expect(response.body).to.have.property('id');
-                expect(response.body).to.have.property('email', emailAtualizado);
+                expect(response.body).to.have.property('id', Id);
+                expect(response.body).to.have.property('email', cadastroAtualizado.email);
             });
+
     });
 
 
     it('GET - Validar se os dados foram atualizados', () => {
-
-        const requestPayload = {
+        cy.api({
             method: 'GET',
-            url: `${baseUrl}/${Id}`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        cy.api(requestPayload)
+            url: `${CADASTRO}/${Id}`
+        })
             .then((response) => {
 
                 expect(response.headers).to.have.property('content-type').and.include('application/json');
@@ -213,53 +145,39 @@ describe('Testes da API', () => {
                 expect(response.status).to.eq(200);
 
                 expect(response.body).to.have.property('id', Id);
-                expect(response.body).to.have.property('name', nameAtualizado);
-                expect(response.body).to.have.property('email', emailAtualizado);
-
+                expect(response.body).to.have.property('name', cadastroAtualizado.name);
+                expect(response.body).to.have.property('email', cadastroAtualizado.email);
             });
 
     });
 
 
     it('DELETE - Excluir cadastro', () => {
-
-        const requestPayload = {
+        cy.api({
             method: 'DELETE',
-            url: `${baseUrl}/${Id}`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        cy.api(requestPayload)
+            url: `${CADASTRO}/${Id}`
+        })
             .then((response) => {
                 expect(response.headers).to.have.property('content-type').and.include('application/json');
 
                 expect(response.status).to.eq(200);
 
                 expect(response.body).to.have.property('createdAt');
-                expect(response.body).to.have.property('name', nameAtualizado);
+                expect(response.body).to.have.property('name', cadastroAtualizado.name);
                 expect(response.body).to.have.property('avatar');
-                expect(response.body).to.have.property('id');
-                expect(response.body).to.have.property('email', emailAtualizado);
+                expect(response.body).to.have.property('id', Id);
+                expect(response.body).to.have.property('email', cadastroAtualizado.email);
             });
 
     });
 
 
-    it('GET - Validar se o registro foi excluido, deve retornar status 404', () => {
-
-        const requestPayload = {
+    it('GET - Validar se o registro foi excluído, deve retornar status 404', () => {
+        cy.api({
             method: 'GET',
-            url: `${baseUrl}/${Id}`,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            
+            url: `${CADASTRO}/${Id}`,
             failOnStatusCode: false
-        };
-
-        cy.api(requestPayload)
+        })
             .then((response) => {
                 expect(response.status).to.eq(404);
                 expect(response.body).to.contain("Not found");
